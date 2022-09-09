@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    "target": "ES2020",
+    "moduleResolution": "Node",
+    "module": "ESNext",
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "strict": true,
+    "noEmitOnError": true,
+    "exactOptionalPropertyTypes": true,
+    "importsNotUsedAsValues": "error",
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "baseUrl": "./src"
+  },
+  "include": ["src", "rollup.config.ts"],
+  "exclude": ["dist", "node_moudles"]
+}
