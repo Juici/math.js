@@ -1,10 +1,10 @@
-import type { InspectOptionsStylized } from "node:util";
+import { name as PKG_NAME, version as PKG_VERSION } from "../package.json";
 
 import { ParseDecimalError } from "./error";
 import { cmp, divRem } from "./math";
-import { customInspectSymbol, parseInt, parseBigInt } from "./util";
+import { customInspectSymbol, parseBigInt, parseInt } from "./util";
 
-import { name as PKG_NAME, version as PKG_VERSION } from "../package.json";
+import type { InspectOptionsStylized } from "node:util";
 
 type DecimalValue = string | number | bigint | BigDecimal | BigDecimalLike;
 
@@ -495,10 +495,10 @@ export class BigDecimal {
 
     let s = before;
     if (after.length > 0) {
-      s += "." + after;
+      s += `.${after}`;
     }
 
-    return neg ? "-" + s : s;
+    return neg ? `-${s}` : s;
   }
 
   /**
@@ -518,7 +518,7 @@ export class BigDecimal {
   /**
    * Getter for the string tag used in the `Object.prototype.toString` method.
    */
-  get [Symbol.toStringTag]() {
+  get [Symbol.toStringTag](): string {
     return "BigDecimal";
   }
 

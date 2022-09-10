@@ -1,13 +1,13 @@
-import type { OutputOptions, Plugin, RollupOptions } from "rollup";
-
 import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
 
+import type { OutputOptions, Plugin, RollupOptions } from "rollup";
+
 function buildConfig(
   output: OutputOptions,
-  plugins: Plugin[] = [],
+  plugins: Array<Plugin> = [],
 ): RollupOptions {
   return {
     input: "src/index.ts",
@@ -27,9 +27,9 @@ function buildConfig(
   };
 }
 
-export default async function (
+export default async function config(
   _command: Record<string, unknown>,
-): Promise<RollupOptions | RollupOptions[]> {
+): Promise<RollupOptions | Array<RollupOptions>> {
   return [
     buildConfig({
       file: "dist/index.cjs",
