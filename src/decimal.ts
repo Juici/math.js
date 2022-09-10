@@ -22,10 +22,18 @@ export class BigDecimal {
   private digits: bigint;
   private scale: number;
 
+  /**
+   * Creates a BigDecimal with the given digits and scale.
+   */
   constructor(digits: bigint, scale: number);
+  /**
+   * Creates a BigDecimal from the given value.
+   */
   constructor(n: DecimalValue);
 
   constructor(n: DecimalValue | bigint, scale?: number) {
+    // Use a symbol to indentify instances of BigDecimal. This helps to provide better
+    // compatibility for bundled copies of the class.
     Object.defineProperty(this, BIG_DECIMAL_SYMBOL, {
       configurable: false,
       enumerable: false,
@@ -555,7 +563,14 @@ export class BigDecimal {
   /**
    * Checks if the given object is an instance of BigDecimal.
    */
-  static [Symbol.hasInstance](instance: unknown): boolean {
+  static [Symbol.hasInstance](instance: unknown): instance is BigDecimal {
+    return BigDecimal.isBigDecimal(instance);
+  }
+
+  /**
+   * Checks if the given object is an instance of BigDecimal.
+   */
+  static isBigDecimal(instance: unknown): instance is BigDecimal {
     return (
       typeof instance === "object" &&
       instance !== null &&
