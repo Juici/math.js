@@ -16,7 +16,7 @@ function buildConfig(
       nodeResolve(),
       json({ preferConst: true }),
       commonjs(),
-      typescript({ removeComments: true }),
+      typescript(),
       ...plugins,
     ],
     treeshake: {
