@@ -19,8 +19,14 @@ const BIG_DECIMAL_SYMBOL = Symbol.for(`${PKG_NAME}[BigDecimal]`);
  * A big decimal type.
  */
 export class BigDecimal {
-  private readonly _digits: bigint;
-  private readonly _scale: number;
+  /**
+   * The digits in this BigDecimal.
+   */
+  readonly digits: bigint;
+  /**
+   * The scale by which the digits in this BigDecimal are shifted.
+   */
+  readonly scale: number;
 
   /**
    * Creates a BigDecimal with the given digits and scale.
@@ -39,76 +45,62 @@ export class BigDecimal {
       if (typeof n !== "bigint") {
         throw new TypeError("Argument 'digits' must be a bigint");
       }
-      this._digits = n;
-      this._scale = scale;
+      this.digits = n;
+      this.scale = scale;
     } else {
-      [this._digits, this._scale] = components(n);
+      [this.digits, this.scale] = components(n);
     }
 
-    [this._digits, this._scale] = normalize(this._digits, this._scale);
-  }
-
-  /**
-   * The digits in this BigDecimal.
-   */
-  get digits(): bigint {
-    return this._digits;
-  }
-
-  /**
-   * The scale by which the digits in this BigDecimal are shifted.
-   */
-  get scale(): number {
-    return this._scale;
+    [this.digits, this.scale] = normalize(this.digits, this.scale);
   }
 
   /**
    * The number of decimal places in this BigDecimal.
    */
   get dp(): number {
-    return this._scale < 0 ? 0 : this._scale;
+    return this.scale < 0 ? 0 : this.scale;
   }
 
   /**
    * The sign of this BigDecimal.
    */
   get sign(): -1 | 0 | 1 {
-    return this._digits === 0n ? 0 : this._digits < 0n ? -1 : 1;
+    return this.digits === 0n ? 0 : this.digits < 0n ? -1 : 1;
   }
 
   /**
    * Checks if this BigDecimal is an integer.
    */
   isInt(): boolean {
-    return this._scale <= 0;
+    return this.scale <= 0;
   }
 
   /**
    * Checks if this BigDecimal is negative.
    */
   isNeg(): boolean {
-    return this._digits < 0n;
+    return this.digits < 0n;
   }
 
   /**
    * Checks if this BigDecimal is positive.
    */
   isPos(): boolean {
-    return this._digits > 0n;
+    return this.digits > 0n;
   }
 
   /**
    * Checks if this BigDecimal is 0.
    */
   isZero(): boolean {
-    return this._digits === 0n;
+    return this.digits === 0n;
   }
 
   /**
    * Checks if this BigDecimal is 1.
    */
   isOne(): boolean {
-    return this._scale === 0 && this._digits === 1n;
+    return this.scale === 0 && this.digits === 1n;
   }
 
   /**
@@ -116,7 +108,7 @@ export class BigDecimal {
    */
   eq(other: DecimalValue): boolean {
     const [digits, scale] = normalize(...components(other));
-    return this._digits === digits && this._scale === scale;
+    return this.digits === digits && this.scale === scale;
   }
 
   /**
@@ -138,14 +130,14 @@ export class BigDecimal {
       return s1;
     }
 
-    let d1 = this._digits;
-    let d2 = n._digits;
+    let d1 = this.digits;
+    let d2 = n.digits;
 
     // Adjust the digits to the same scale.
-    if (this._scale < n._scale) {
-      d1 *= 10n ** BigInt(n._scale - this._scale);
-    } else if (this._scale > n._scale) {
-      d2 *= 10n ** BigInt(this._scale - n._scale);
+    if (this.scale < n.scale) {
+      d1 *= 10n ** BigInt(n.scale - this.scale);
+    } else if (this.scale > n.scale) {
+      d2 *= 10n ** BigInt(this.scale - n.scale);
     }
 
     return cmp(d1, d2);
@@ -187,14 +179,14 @@ export class BigDecimal {
    * Returns the negation of this BigDecimal.
    */
   neg(): BigDecimal {
-    return new BigDecimal(-this._digits, this._scale);
+    return new BigDecimal(-this.digits, this.scale);
   }
 
   /**
    * Returns the addition of this BigDecimal with the given value.
    */
   add(other: DecimalValue): BigDecimal {
-    const { _digits: ld, _scale: ls } = this;
+    const { digits: ld, scale: ls } = this;
     const [rd, rs] = components(other);
     const [l, r, scale] = withScale(ld, ls, rd, rs);
     return new BigDecimal(l + r, scale);
@@ -204,7 +196,7 @@ export class BigDecimal {
    * Returns the subtraction of this BigDecimal by the given value.
    */
   sub(other: DecimalValue): BigDecimal {
-    const { _digits: ld, _scale: ls } = this;
+    const { digits: ld, scale: ls } = this;
     const [rd, rs] = components(other);
     const [l, r, scale] = withScale(ld, ls, rd, rs);
     return new BigDecimal(l - r, scale);
@@ -215,8 +207,8 @@ export class BigDecimal {
    */
   mul(other: DecimalValue): BigDecimal {
     let [digits, scale] = components(other);
-    digits *= this._digits;
-    scale += this._scale;
+    digits *= this.digits;
+    scale += this.scale;
     return new BigDecimal(digits, scale);
   }
 
@@ -234,19 +226,19 @@ export class BigDecimal {
       return this;
     }
 
-    const scale = this._scale - n._scale;
-    if (this._digits === n._digits) {
+    const scale = this.scale - n.scale;
+    if (this.digits === n.digits) {
       return new BigDecimal(1n, scale);
     }
 
-    return implDiv(this._digits, n._digits, scale, dp);
+    return implDiv(this.digits, n.digits, scale, dp);
   }
 
   /**
    * Returns the remainder of this BigDecimal divided by the given value.
    */
   rem(other: DecimalValue): BigDecimal {
-    const { _digits: ld, _scale: ls } = this;
+    const { digits: ld, scale: ls } = this;
     const [rd, rs] = components(other);
     const [l, r, scale] = withScale(ld, ls, rd, rs);
     return new BigDecimal(l % r, scale);
@@ -260,10 +252,10 @@ export class BigDecimal {
   half(): BigDecimal {
     if (this.isZero()) {
       return this;
-    } else if (this._digits % 2n === 0n) {
-      return new BigDecimal(this._digits / 2n, this._scale);
+    } else if (this.digits % 2n === 0n) {
+      return new BigDecimal(this.digits / 2n, this.scale);
     } else {
-      return new BigDecimal(this._digits * 5n, this._scale + 1);
+      return new BigDecimal(this.digits * 5n, this.scale + 1);
     }
   }
 
@@ -273,12 +265,12 @@ export class BigDecimal {
   toDP(dp: number): BigDecimal {
     validateDP(dp);
 
-    if (dp >= this._scale) {
+    if (dp >= this.scale) {
       return this;
     }
 
-    const factor = 10n ** BigInt(this._scale - dp);
-    const [q, r] = divRem(this._digits, factor);
+    const factor = 10n ** BigInt(this.scale - dp);
+    const [q, r] = divRem(this.digits, factor);
 
     return new BigDecimal(q + roundingTerm(r), dp);
   }
@@ -294,15 +286,15 @@ export class BigDecimal {
    * Returns the value of this BigDecimal rounded to a primitive bigint.
    */
   toBigInt(): bigint {
-    if (this._scale === 0) {
-      return this._digits;
-    } else if (this._scale > 0) {
-      const factor = 10n ** BigInt(this._scale);
-      const [q, r] = divRem(this._digits, factor);
+    if (this.scale === 0) {
+      return this.digits;
+    } else if (this.scale > 0) {
+      const factor = 10n ** BigInt(this.scale);
+      const [q, r] = divRem(this.digits, factor);
       return q + roundingTerm(r);
     } else {
-      const factor = 10n ** BigInt(-this._scale);
-      return this._digits * factor;
+      const factor = 10n ** BigInt(-this.scale);
+      return this.digits * factor;
     }
   }
 
@@ -310,8 +302,8 @@ export class BigDecimal {
    * Returns a string representing the value of this BigDecimal.
    */
   toString(dp?: number): string {
-    let digits: bigint | string = this._digits;
-    let scale = this._scale;
+    let digits: bigint | string = this.digits;
+    let scale = this.scale;
 
     if (dp !== undefined && dp < scale) {
       const factor = 10n ** BigInt(scale - dp);
