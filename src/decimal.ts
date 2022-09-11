@@ -13,7 +13,7 @@ interface BigDecimalLike {
   scale: number;
 }
 
-const BIG_DECIMAL_SYMBOL = Symbol.for(`${PKG_NAME}:BigDecimal`);
+const BIG_DECIMAL_SYMBOL = Symbol.for(`${PKG_NAME}[BigDecimal]`);
 
 /**
  * A big decimal type.
