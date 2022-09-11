@@ -63,5 +63,8 @@
   "engines": {
     "node": ">=14.18.0"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "packageManager": "yarn@3.2.3"
 }
