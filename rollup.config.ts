@@ -52,8 +52,8 @@ function buildConfig(
     plugins: [
       nodeResolve(),
       json({ preferConst: true }),
-      commonjs(),
-      typescript(),
+      commonjs({ sourceMap: true }),
+      typescript({ sourceMap: true }),
       emitModulePackageJson(packageType(output.format)),
       ...plugins,
     ],
