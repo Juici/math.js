@@ -91,6 +91,9 @@ module.exports = {
       env: {
         node: true,
       },
+      rules: {
+        "no-console": "off",
+      },
     },
   ],
   parser: "@typescript-eslint/parser",
