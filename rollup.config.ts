@@ -72,12 +72,12 @@ export default async function config(
 ): Promise<RollupOptions | Array<RollupOptions>> {
   return [
     buildConfig({
+      file: "dist/cjs/index.js",
       format: "cjs",
-      dir: "dist/cjs",
     }),
     buildConfig({
+      file: "dist/esm/index.js",
       format: "esm",
-      dir: "dist/esm",
     }),
   ];
 }
