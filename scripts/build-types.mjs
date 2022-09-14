@@ -9,6 +9,7 @@ import deepmerge from "deepmerge";
 import fs from "graceful-fs";
 import { packageDirectory as pkgDir } from "pkg-dir";
 import prettier from "prettier";
+import ms from "pretty-ms";
 import ts from "typescript";
 
 const require = createRequire(import.meta.url);
@@ -30,12 +31,9 @@ if (typescriptCompilerFolder === root) {
   process.exit(1);
 }
 
-// Remove build directory.
 await removeBuildDir();
 
-// Read the base config from the tsconfig.json file.
 const tsconfig = await readTsConfig(tsconfigFile);
-
 const prettierConfig = await prettier.resolveConfig(__filename);
 
 // Compile TypeScript definition files.
@@ -51,9 +49,12 @@ const prettierConfig = await prettier.resolveConfig(__filename);
   });
 
   console.log();
-  console.log(chalk.blue("Compiling TypeScript definition files"));
+  console.log(chalk.cyan("Compiling definition files..."));
 
+  const start = Date.now();
   const emitResult = program.emit();
+  const duration = Date.now() - start;
+
   const diagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
   if (emitDiagnostics(diagnostics)) {
     process.exit(1);
@@ -66,13 +67,10 @@ const prettierConfig = await prettier.resolveConfig(__filename);
     process.exit(1);
   }
 
-  console.log(chalk.green("Compiled TypeScript definition files"));
+  console.log(chalk.green(`Compiled definition files in ${chalk.bold(ms(duration))}`));
 }
 
 {
-  console.log();
-  console.log(chalk.blue("Extracting TypeScript definition files"));
-
   /**
    * @type {import("@microsoft/api-extractor").IConfigFile}
    */
@@ -100,8 +98,6 @@ const prettierConfig = await prettier.resolveConfig(__filename);
         default: { logLevel: "warning" },
       },
       extractorMessageReporting: {
-        "ae-forgotten-export": { logLevel: "none" },
-        "ae-missing-release-tag": { logLevel: "none" },
         default: { logLevel: "warning" },
       },
       tsdocMessageReporting: {
@@ -123,6 +119,10 @@ const prettierConfig = await prettier.resolveConfig(__filename);
     packageJsonFullPath: packageJsonFile,
   });
 
+  console.log();
+  console.log(chalk.cyan("Extracting definition files..."));
+
+  const start = Date.now();
   const extractorResult = Extractor.invoke(extractorConfig, {
     localBuild: true,
     showVerboseMessages: true,
@@ -133,9 +133,10 @@ const prettierConfig = await prettier.resolveConfig(__filename);
       }
     },
   });
+  const duration = Date.now() - start;
 
   if (!extractorResult.succeeded || extractorResult.warningCount > 0) {
-    console.log(chalk.red("Unable to extract TypeScript definition files"));
+    console.log(chalk.red("Unable to extract definition files"));
 
     const errors = chalk.red(pluralize(extractorResult.errorCount, "error"));
     const warnings = chalk.yellow(pluralize(extractorResult.warningCount, "warning"));
@@ -147,7 +148,6 @@ const prettierConfig = await prettier.resolveConfig(__filename);
   const outFile = extractorResult.extractorConfig.untrimmedFilePath;
   const relativePath = chalk.bold(path.relative(root, outFile));
 
-  // Remove build directory.
   await removeBuildDir();
 
   const definitions = await fs.promises.readFile(outFile, "utf-8");
@@ -159,7 +159,9 @@ const prettierConfig = await prettier.resolveConfig(__filename);
 
   await fs.promises.writeFile(outFile, formattedDefinitions);
 
-  console.log(chalk.green(`Extracted TypeScript definition files to ${relativePath}`));
+  console.log(
+    chalk.green(`Extracted definition files to ${relativePath} in ${chalk.bold(ms(duration))}`),
+  );
 }
 
 async function removeBuildDir() {
@@ -238,10 +240,13 @@ function emitDiagnostics(diagnostics) {
   return error;
 }
 
-function pluralize(n, singular, plural) {
-  if (!plural) {
-    plural = `${singular}s`;
-  }
+/**
+ * @param {number} n
+ * @param {string} singular
+ * @param {string?} plural
+ * @returns {string}
+ */
+function pluralize(n, singular, plural = `${singular}s`) {
   const rules = new Intl.PluralRules([], { type: "cardinal" });
   const rule = rules.select(n);
   return `${n} ${rule === "one" ? singular : plural}`;

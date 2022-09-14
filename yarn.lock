@@ -820,6 +820,7 @@ __metadata:
     jest: ^29.0.2
     pkg-dir: ^7.0.0
     prettier: ^2.7.1
+    pretty-ms: ^8.0.0
     rimraf: ^3.0.2
     rollup: ^2.79.0
     rollup-plugin-terser: ^7.0.2
@@ -4765,6 +4766,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"parse-ms@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "parse-ms@npm:3.0.0"
+  checksum: fc602bba093835562321a67a9d6c8c9687ca4f26a09459a77e07ebd7efddd1a5766725ec60eb0c83a2abe67f7a23808f7deb1c1226727776eaf7f9607ae09db2
+  languageName: node
+  linkType: hard
+
 "path-exists@npm:^4.0.0":
   version: 4.0.0
   resolution: "path-exists@npm:4.0.0"
@@ -4886,6 +4894,15 @@ __metadata:
     ansi-styles: ^5.0.0
     react-is: ^18.0.0
   checksum: 02aa8f0e9a91d52d0ca67911b72dc44ae23f41dd50de961f9c86947046f2ced0818c4baccc806f89e78b13e8ee690f5d55a6a8cbdae03f5990c1f5e79ac81048
+  languageName: node
+  linkType: hard
+
+"pretty-ms@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "pretty-ms@npm:8.0.0"
+  dependencies:
+    parse-ms: ^3.0.0
+  checksum: b7d2a8182887af0e5ab93f9df331f10db9b8eda86855e2de115eb01a6c501bde5631a8813b1b0abdd7d045e79b08ae875369a8fd279a3dacd6d9e572bdd3bfa6
   languageName: node
   linkType: hard
 
