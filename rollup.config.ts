@@ -16,9 +16,7 @@ import type {
 const onwarn: WarningHandlerWithDefault = (warning, rollupWarn) => {
   rollupWarn(warning);
   if (warning.code === "CIRCULAR_DEPENDENCY") {
-    throw new Error(
-      "Please eliminate the circular dependencies listed above and retry the build",
-    );
+    throw new Error("Please eliminate the circular dependencies listed above and retry the build");
   }
 };
 

@@ -6,6 +6,7 @@
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
 
+    "noEmit": true,
     "importsNotUsedAsValues": "error",
     "stripInternal": true,
 
@@ -20,9 +21,7 @@
     "noUncheckedIndexedAccess": true,
 
     "isolatedModules": true,
-    "resolveJsonModule": true,
-
-    "baseUrl": "./src"
+    "resolveJsonModule": true
   },
   "include": ["src", "rollup.config.ts"],
   "exclude": ["dist", "node_moudles"]

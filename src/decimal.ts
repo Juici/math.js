@@ -6,11 +6,11 @@ import { customInspectSymbol, parseBigInt, parseInt } from "./util";
 
 import type { InspectOptionsStylized } from "node:util";
 
-type DecimalValue = string | number | bigint | BigDecimal | BigDecimalLike;
+export type DecimalValue = string | number | bigint | BigDecimalLike;
 
-interface BigDecimalLike {
-  digits: bigint;
-  scale: number;
+export interface BigDecimalLike {
+  readonly digits: bigint;
+  readonly scale: number;
 }
 
 const BIG_DECIMAL_SYMBOL = Symbol.for(`${PKG_NAME}[BigDecimal]`);
@@ -368,7 +368,7 @@ export class BigDecimal {
   /**
    * Getter for the string tag used in the `Object.prototype.toString` method.
    */
-  get [Symbol.toStringTag](): string {
+  get [Symbol.toStringTag](): "BigDecimal" {
     return "BigDecimal";
   }
 
@@ -402,35 +402,25 @@ export class BigDecimal {
 
   /**
    * Custom inspection function for Node.js.
+   *
+   * @internal
    */
-  [customInspectSymbol](
-    _depth: number,
-    options: InspectOptionsStylized,
-  ): string {
+  [customInspectSymbol](_depth: number, options: InspectOptionsStylized): string {
     return options.stylize(this.toString(), "number");
   }
 
   /**
    * Checks if the given object is an instance of BigDecimal.
+   *
+   * @internal
    */
   static [Symbol.hasInstance](instance: unknown): instance is BigDecimal {
-    return BigDecimal.isBigDecimal(instance);
-  }
-
-  /**
-   * Checks if the given object is an instance of BigDecimal.
-   */
-  static isBigDecimal(instance: unknown): instance is BigDecimal {
-    return (
-      typeof instance === "object" &&
-      instance !== null &&
-      BIG_DECIMAL_SYMBOL in instance
-    );
+    return typeof instance === "object" && instance !== null && BIG_DECIMAL_SYMBOL in instance;
   }
 }
 
-// Use a symbol to indentify instances of BigDecimal. This helps to provide better
-// compatibility for bundled copies of the class.
+// Use a symbol to indentify instances of BigDecimal. This helps to provide
+// better compatibility for bundled copies of the class.
 Object.defineProperty(BigDecimal.prototype, BIG_DECIMAL_SYMBOL, {
   configurable: false,
   enumerable: false,
@@ -449,12 +439,7 @@ function isBigDecimalLike(n: unknown): n is BigDecimalLike {
   );
 }
 
-function implDiv(
-  numer: bigint,
-  denom: bigint,
-  scale: number,
-  dp: number,
-): BigDecimal {
+function implDiv(numer: bigint, denom: bigint, scale: number, dp: number): BigDecimal {
   if (numer === 0n) {
     return new BigDecimal(0n);
   }
@@ -517,9 +502,7 @@ function implDiv(
 
 function validateDP(dp: number) {
   if (dp < 0 || !Number.isInteger(dp)) {
-    throw new RangeError(
-      "Decimal places must be an integer greater than or equal to 0",
-    );
+    throw new RangeError("Decimal places must be an integer greater than or equal to 0");
   }
 }
 
@@ -583,17 +566,13 @@ function parseDecimal(s: string): [bigint, number] {
 
     const expStr = s.slice(e + 1);
     if (expStr.length === 0) {
-      throw new ParseDecimalError(
-        `Cannot parse decimal with empty exponent: ${s}`,
-      );
+      throw new ParseDecimalError(`Cannot parse decimal with empty exponent: ${s}`);
     }
     exp = parseInt(expStr);
   }
 
   if (mantissa.length === 0) {
-    throw new ParseDecimalError(
-      `Cannot parse decimal with empty mantissa: ${s}`,
-    );
+    throw new ParseDecimalError(`Cannot parse decimal with empty mantissa: ${s}`);
   }
 
   const dot = mantissa.indexOf(".");
@@ -623,12 +602,7 @@ function normalize(digits: bigint, scale: number): [bigint, number] {
   return [digits, scale];
 }
 
-function withScale(
-  ld: bigint,
-  ls: number,
-  rd: bigint,
-  rs: number,
-): [bigint, bigint, number] {
+function withScale(ld: bigint, ls: number, rd: bigint, rs: number): [bigint, bigint, number] {
   let scale = ls;
   if (ls < rs) {
     ld *= 10n ** BigInt(rs - ls);

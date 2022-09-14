@@ -8,6 +8,7 @@
 # Dependencies/Build.
 /node_modules/
 /dist/
+/build/
 
 # Logs.
 npm-debug.log*

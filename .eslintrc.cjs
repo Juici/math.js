@@ -41,10 +41,7 @@ module.exports = {
             ignoreProperties: true,
           },
         ],
-        "@typescript-eslint/no-unused-vars": [
-          "error",
-          { argsIgnorePattern: "^_" },
-        ],
+        "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
         "@typescript-eslint/prefer-includes": "warn",
         "@typescript-eslint/prefer-literal-enum-member": [
           "error",
@@ -87,7 +84,7 @@ module.exports = {
       },
     },
     {
-      files: [".eslintrc.cjs", "rollup.config.ts"],
+      files: ["scripts/**", "build-plugins/**", ".eslintrc.cjs", "rollup.config.ts"],
       env: {
         node: true,
       },
@@ -110,6 +107,7 @@ module.exports = {
       {
         devDependencies: [
           "**/__tests__/**",
+          "build-plugins/**",
           "scripts/**",
           ".eslintrc.cjs",
           "rollup.config.ts",
@@ -123,16 +121,7 @@ module.exports = {
         alphabetize: {
           order: "asc",
         },
-        groups: [
-          "builtin",
-          "external",
-          "internal",
-          "parent",
-          "sibling",
-          "index",
-          "object",
-          "type",
-        ],
+        groups: ["builtin", "external", "internal", "parent", "sibling", "index", "object", "type"],
         "newlines-between": "always",
       },
     ],
@@ -143,10 +132,7 @@ module.exports = {
 
     "no-array-constructor": "error",
     "no-caller": "error",
-    "no-console": [
-      "warn",
-      { allow: ["warn", "error", "time", "timeEnd", "timeStamp"] },
-    ],
+    "no-console": ["warn", { allow: ["warn", "error", "time", "timeEnd", "timeStamp"] }],
     "no-eval": "error",
     "no-extend-native": "warn",
     "no-extra-bind": "warn",
@@ -183,11 +169,7 @@ module.exports = {
     "prefer-rest-params": "warn",
     "prefer-spread": "warn",
     "prefer-template": "error",
-    quotes: [
-      "error",
-      "double",
-      { allowTemplateLiterals: false, avoidEscape: false },
-    ],
+    quotes: ["error", "double", { allowTemplateLiterals: false, avoidEscape: false }],
     radix: "warn",
     "sort-imports": ["error", { ignoreDeclarationSort: true }],
   },
