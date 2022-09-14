@@ -1,8 +1,6 @@
-import { name as PKG_NAME, version as PKG_VERSION } from "../package.json";
-
-import { ParseDecimalError } from "./error";
-import { cmp, divRem } from "./math";
-import { customInspectSymbol, parseBigInt, parseInt } from "./util";
+import { ParseDecimalError } from "./errors/ParseDecimalError";
+import { cmp, divRem, parseBigInt, parseIntStrict } from "./math";
+import { customInspectSymbol, setHasInstance } from "./util";
 
 import type { InspectOptionsStylized } from "node:util";
 
@@ -12,8 +10,6 @@ export interface BigDecimalLike {
   readonly digits: bigint;
   readonly scale: number;
 }
-
-const BIG_DECIMAL_SYMBOL = Symbol.for(`${PKG_NAME}[BigDecimal]`);
 
 /**
  * A big decimal type.
@@ -408,25 +404,9 @@ export class BigDecimal {
   [customInspectSymbol](_depth: number, options: InspectOptionsStylized): string {
     return options.stylize(this.toString(), "number");
   }
-
-  /**
-   * Checks if the given object is an instance of BigDecimal.
-   *
-   * @internal
-   */
-  static [Symbol.hasInstance](instance: unknown): instance is BigDecimal {
-    return typeof instance === "object" && instance !== null && BIG_DECIMAL_SYMBOL in instance;
-  }
 }
 
-// Use a symbol to indentify instances of BigDecimal. This helps to provide
-// better compatibility for bundled copies of the class.
-Object.defineProperty(BigDecimal.prototype, BIG_DECIMAL_SYMBOL, {
-  configurable: false,
-  enumerable: false,
-  value: PKG_VERSION,
-  writable: false,
-});
+setHasInstance(BigDecimal);
 
 function isBigDecimalLike(n: unknown): n is BigDecimalLike {
   return (
@@ -568,7 +548,7 @@ function parseDecimal(s: string): [bigint, number] {
     if (expStr.length === 0) {
       throw new ParseDecimalError(`Cannot parse decimal with empty exponent: ${s}`);
     }
-    exp = parseInt(expStr);
+    exp = parseIntStrict(expStr);
   }
 
   if (mantissa.length === 0) {
