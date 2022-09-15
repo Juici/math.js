@@ -3,24 +3,31 @@ import json from "@rollup/plugin-json";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
 
-import emitModulePackageJson from "./build-plugins/emit-module-package-json";
+import emitModulePackageJson from "./build-plugins/emit-module-package-json.mjs";
 
-import type {
-  ModuleFormat,
-  OutputOptions,
-  Plugin,
-  RollupOptions,
-  WarningHandlerWithDefault,
-} from "rollup";
+/**
+ * @typedef {import("rollup").ModuleFormat} ModuleFormat
+ * @typedef {import("rollup").OutputOptions} OutputOptions
+ * @typedef {import("rollup").Plugin} Plugin
+ * @typedef {import("rollup").RollupOptions} RollupOptions
+ * @typedef {import("rollup").WarningHandlerWithDefault} WarningHandlerWithDefault
+ */
 
-const onwarn: WarningHandlerWithDefault = (warning, rollupWarn) => {
+/**
+ * @type {WarningHandlerWithDefault}
+ */
+function onwarn(warning, rollupWarn) {
   rollupWarn(warning);
   if (warning.code === "CIRCULAR_DEPENDENCY") {
     throw new Error("Please eliminate the circular dependencies listed above and retry the build");
   }
-};
+}
 
-function packageType(format: ModuleFormat): "commonjs" | "module" {
+/**
+ * @param {ModuleFormat} format
+ * @returns {"commonjs" | "module"}
+ */
+function packageType(format) {
   switch (format) {
     case "es":
     case "esm":
@@ -30,10 +37,12 @@ function packageType(format: ModuleFormat): "commonjs" | "module" {
   }
 }
 
-function buildConfig(
-  output: OutputOptions & { format: ModuleFormat },
-  plugins: Array<Plugin> = [],
-): RollupOptions {
+/**
+ * @param {OutputOptions & { format: ModuleFormat }} output
+ * @param {Array<Plugin>} plugins
+ * @returns {RollupOptions}
+ */
+function buildConfig(output, plugins = []) {
   return {
     input: "src/index.ts",
     output: {
@@ -51,7 +60,7 @@ function buildConfig(
       nodeResolve(),
       json({ preferConst: true }),
       commonjs({ sourceMap: true }),
-      typescript({ sourceMap: true }),
+      typescript({ sourceMap: true, exclude: ["**/__tests__/**"] }),
       emitModulePackageJson(packageType(output.format)),
       ...plugins,
     ],
@@ -65,9 +74,11 @@ function buildConfig(
   };
 }
 
-export default async function config(
-  _command: Record<string, unknown>,
-): Promise<RollupOptions | Array<RollupOptions>> {
+/**
+ * @param {Record<string, unknown>} _command
+ * @returns {Promise<RollupOptions | Array<RollupOptions>}
+ */
+export default async function config(_command) {
   return [
     buildConfig({
       file: "dist/cjs/index.js",

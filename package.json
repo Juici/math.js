@@ -34,7 +34,7 @@
     "lint": "eslint . --cache --ext cjs,mjs,ts,md",
     "test": "yarn lint && jest",
     "build": "rimraf dist && yarn build:ts && yarn build:types",
-    "build:ts": "rollup --config rollup.config.ts --configPlugin typescript",
+    "build:ts": "rollup --config rollup.config.mjs",
     "build:types": "node ./scripts/build-types.mjs",
     "prepare": "yarn build",
     "prepublishOnly": "yarn test"

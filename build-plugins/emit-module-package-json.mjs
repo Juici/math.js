@@ -1,6 +1,12 @@
-import type { Plugin } from "rollup";
+/**
+ * @typedef {import("rollup").Plugin} Plugin
+ */
 
-export default function emitModulePackageJson(type: "commonjs" | "module"): Plugin {
+/**
+ * @param {"commonjs" | "module"} type
+ * @returns {Plugin}
+ */
+export default function emitModulePackageJson(type) {
   return {
     name: "emit-module-package-json",
     generateBundle() {

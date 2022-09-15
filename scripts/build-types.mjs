@@ -243,7 +243,7 @@ function emitDiagnostics(diagnostics) {
 /**
  * @param {number} n
  * @param {string} singular
- * @param {string?} plural
+ * @param {string} plural
  * @returns {string}
  */
 function pluralize(n, singular, plural = `${singular}s`) {

@@ -78,18 +78,31 @@ module.exports = {
       files: ["**/__tests__/**"],
       rules: {
         "@typescript-eslint/ban-ts-comment": "off",
-        "@typescript-eslint/no-unused-vars": "off",
         "@typescript-eslint/explicit-module-boundary-types": "off",
+        "@typescript-eslint/no-empty-function": "off",
+        "@typescript-eslint/no-unused-vars": "off",
         "no-console": "off",
       },
     },
     {
-      files: ["scripts/**", "build-plugins/**", ".eslintrc.cjs", "rollup.config.ts"],
+      files: [
+        "build-plugins/**",
+        "scripts/**",
+        ".eslintrc.cjs",
+        "jest.config.mjs",
+        "rollup.config.mjs",
+      ],
       env: {
         node: true,
       },
       rules: {
         "no-console": "off",
+      },
+    },
+    {
+      files: ["rollup/**"],
+      parserOptions: {
+        project: "rollup/tsconfig.json",
       },
     },
   ],
@@ -110,7 +123,8 @@ module.exports = {
           "build-plugins/**",
           "scripts/**",
           ".eslintrc.cjs",
-          "rollup.config.ts",
+          "jest.config.mjs",
+          "rollup.config.mjs",
         ],
       },
     ],
