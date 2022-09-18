@@ -3,10 +3,10 @@ import { ParseDecimalError } from "../../errors";
 
 describe("new BigDecimal(digits, scale)", () => {
   test("new BigDecimal(bigint, number)", () => {
-    const v = new BigDecimal(-101n, 2);
-    expect(v.sign).toBe(-1);
-    expect(v.dp).toBe(2);
-    expect(v.toString()).toBe("-1.01");
+    const n = new BigDecimal(-101n, 2);
+    expect(n.sign).toBe(-1);
+    expect(n.dp).toBe(2);
+    expect(n.toString()).toBe("-1.01");
   });
 
   test("not bigint digits", () => {

@@ -148,7 +148,7 @@ export class BigDecimal {
   /**
    * Checks if this BigDecimal is less than or equal to the given value.
    */
-  lte(other: DecimalValue): boolean {
+  le(other: DecimalValue): boolean {
     return this.cmp(other) <= 0;
   }
   /**
@@ -160,7 +160,7 @@ export class BigDecimal {
   /**
    * Checks if this BigDecimal is greater than or equal to the given value.
    */
-  gte(other: DecimalValue): boolean {
+  ge(other: DecimalValue): boolean {
     return this.cmp(other) >= 0;
   }
 
