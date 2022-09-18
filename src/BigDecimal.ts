@@ -1,5 +1,5 @@
-import { ParseDecimalError } from "./errors/ParseDecimalError";
-import { cmp, divRem, parseBigInt, parseIntStrict } from "./math";
+import { cmp, divRem } from "./math";
+import { parseDecimal } from "./parse";
 import { customInspectSymbol, setHasInstance } from "./util";
 
 import type { InspectOptionsStylized } from "node:util";
@@ -210,9 +210,11 @@ export class BigDecimal {
 
   /**
    * Returns the division of this BigDecimal by the given value.
+   *
+   * The number of decimal places precision can be specified, defaulting to 20.
    */
-  div(other: DecimalValue, dp: number = 100): BigDecimal {
-    validateDP(dp);
+  div(other: DecimalValue, dp: number = 20): BigDecimal {
+    dp = validateDP(dp, "dp");
 
     const n = new BigDecimal(other);
     if (n.isZero()) {
@@ -259,7 +261,7 @@ export class BigDecimal {
    * Returns the value of this BigDecimal rounded to the given number of decimal places.
    */
   toDP(dp: number): BigDecimal {
-    validateDP(dp);
+    dp = validateDP(dp, "dp");
 
     if (dp >= this.scale) {
       return this;
@@ -297,11 +299,52 @@ export class BigDecimal {
   /**
    * Returns a string representing the value of this BigDecimal.
    */
-  toString(dp?: number): string {
-    let digits: bigint | string = this.digits;
+  toString(): string {
+    const neg = this.digits < 0n;
+    const digits = neg ? (-this.digits).toString() : this.digits.toString();
+    const len = digits.length;
+
+    let before: string;
+    let after: string;
+
+    if (this.scale >= len) {
+      before = "0";
+      after = "0".repeat(this.scale - len) + digits;
+    } else {
+      const pos = len - this.scale;
+      if (pos > len) {
+        before = digits + "0".repeat(pos - len);
+        after = "";
+      } else {
+        before = digits.slice(0, pos);
+        after = digits.slice(pos);
+      }
+    }
+
+    let s = before;
+    if (after.length > 0) {
+      s += `.${after}`;
+    }
+
+    return neg ? `-${s}` : s;
+  }
+
+  /**
+   * Returns this BigDecimal formatted using fixed-point notation.
+   *
+   * The result is rounded if necessary, and the fractional component is padded
+   * with zeros if necessary so that it has the specified length.
+   *
+   * @param dp The number of decimal places, default `0`.
+   * @throws {RangeError} If `dp` is less than `0`.
+   */
+  toFixed(dp: number = 0): string {
+    dp = validateDP(dp, "dp");
+
+    let digits: bigint = this.digits;
     let scale = this.scale;
 
-    if (dp !== undefined && dp < scale) {
+    if (dp < scale) {
       const factor = 10n ** BigInt(scale - dp);
       const [q, r] = divRem(digits, factor);
 
@@ -311,8 +354,8 @@ export class BigDecimal {
 
     const neg = digits < 0n;
 
-    digits = neg ? (-digits).toString() : digits.toString();
-    const len = digits.length;
+    let s = neg ? (-digits).toString() : digits.toString();
+    const len = s.length;
 
     let before: string;
     let after: string;
@@ -326,20 +369,16 @@ export class BigDecimal {
         before = digits + "0".repeat(pos - len);
         after = "";
       } else {
-        before = digits.slice(0, pos);
-        after = digits.slice(pos);
+        before = s.slice(0, pos);
+        after = s.slice(pos);
       }
     }
 
-    if (dp !== undefined) {
-      if (after.length < dp) {
-        after += "0".repeat(dp - after.length);
-      } else {
-        after = after.slice(0, dp);
-      }
+    if (dp !== undefined && after.length < dp) {
+      after += "0".repeat(dp - after.length);
     }
 
-    let s = before;
+    s = before;
     if (after.length > 0) {
       s += `.${after}`;
     }
@@ -412,10 +451,8 @@ function isBigDecimalLike(n: unknown): n is BigDecimalLike {
   return (
     typeof n === "object" &&
     n !== null &&
-    "digits" in n &&
-    "scale" in n &&
-    typeof (n as { digits: unknown }).digits === "bigint" &&
-    typeof (n as { scale: unknown }).scale === "number"
+    typeof (n as { digits?: unknown }).digits === "bigint" &&
+    typeof (n as { scale?: unknown }).scale === "number"
   );
 }
 
@@ -480,10 +517,11 @@ function implDiv(numer: bigint, denom: bigint, scale: number, dp: number): BigDe
   return new BigDecimal(neg ? -quotient : quotient, scale);
 }
 
-function validateDP(dp: number) {
-  if (dp < 0 || !Number.isInteger(dp)) {
-    throw new RangeError("Decimal places must be an integer greater than or equal to 0");
+function validateDP(dp: number, arg: string): number {
+  if (dp < 0) {
+    throw new RangeError(`Argument '${arg}' must be >= 0`);
   }
+  return Math.trunc(dp);
 }
 
 function roundingTerm(n: bigint): -1n | 0n | 1n {
@@ -509,7 +547,7 @@ function components(n: DecimalValue): [bigint, number] {
 
     case "number":
       if (!Number.isFinite(n)) {
-        throw new RangeError(`Decimal must be finite: ${n}`);
+        throw new RangeError(`BigDecimal must be finite: ${n}`);
       }
       if (Number.isInteger(n)) {
         return [BigInt(Number.isSafeInteger(n) ? n : n.toFixed()), 0];
@@ -528,47 +566,9 @@ function components(n: DecimalValue): [bigint, number] {
   const repr = String(n);
   try {
     return parseDecimal(repr);
-  } catch (e) {
-    throw new TypeError(`Cannot convert '${repr}' to a BigDecimal`);
+  } catch (err) {
+    throw new TypeError(`Cannot convert '${repr}' to a BigDecimal`, { cause: err });
   }
-}
-
-function parseDecimal(s: string): [bigint, number] {
-  let e = s.indexOf("e");
-  if (e === -1) {
-    e = s.indexOf("E");
-  }
-
-  let mantissa = s;
-  let exp = 0;
-  if (e !== -1) {
-    mantissa = s.slice(0, e);
-
-    const expStr = s.slice(e + 1);
-    if (expStr.length === 0) {
-      throw new ParseDecimalError(`Cannot parse decimal with empty exponent: ${s}`);
-    }
-    exp = parseIntStrict(expStr);
-  }
-
-  if (mantissa.length === 0) {
-    throw new ParseDecimalError(`Cannot parse decimal with empty mantissa: ${s}`);
-  }
-
-  const dot = mantissa.indexOf(".");
-
-  let digits = mantissa;
-  let decimalOffset = 0;
-  if (dot !== -1) {
-    const trailing = mantissa.slice(dot + 1);
-    digits = mantissa.slice(0, dot) + trailing;
-    decimalOffset = trailing.length;
-  }
-
-  const value = parseBigInt(digits);
-  const scale = decimalOffset - exp;
-
-  return [value, scale];
 }
 
 function normalize(digits: bigint, scale: number): [bigint, number] {

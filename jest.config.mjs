@@ -1,14 +1,46 @@
+import { createRequire } from "module";
+
 /**
- * @type {import("ts-jest").JestConfigWithTsJest}
+ * @typedef {import("jest").Config} JestConfig
+ * @typedef {import("ts-jest").TsJestGlobalOptions} TsJestOptions
+ */
+
+const require = createRequire(import.meta.url);
+
+/**
+ * @type {JestConfig}
  */
 export default {
-  testPathIgnorePatterns: ["/node_modules/", "/build/", "/dist/", "/scripts/", "/build/"],
+  collectCoverageFrom: ["src/**/*.ts", "!**/__tests__/**", "!build/**", "!dist/**"],
+  modulePathIgnorePatterns: ["build/", "dist/"],
+  roots: ["<rootDir>/src/"],
+  setupFilesAfterEnv: ["<rootDir>/matchers/index.ts"],
+  snapshotFormat: {
+    printBasicPrototype: true,
+    printFunctionName: true,
+  },
+  testPathIgnorePatterns: [
+    "/node_modules/",
+    "/build/",
+    "/dist/",
+    "/scripts/",
+    "/build-plugins/",
+    "\\.snap$",
+  ],
   transform: {
+    /**
+     * @type {[string, TsJestOptions]}
+     */
     "\\.ts$": [
-      "ts-jest",
+      require.resolve("ts-jest"),
       {
-        // isolatedModules: true,
+        isolatedModules: true,
       },
     ],
   },
+  watchPathIgnorePatterns: ["coverage"],
+  watchPlugins: [
+    require.resolve("jest-watch-typeahead/filename"),
+    require.resolve("jest-watch-typeahead/testname"),
+  ],
 };

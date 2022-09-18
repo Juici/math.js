@@ -1,0 +1,8 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true
+  },
+  "javascript.validate.enable": false,
+  "jest.jestCommandLine": "yarn jest",
+  "typescript.tsdk": "node_modules/typescript/lib"
+}

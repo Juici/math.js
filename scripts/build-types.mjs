@@ -38,10 +38,8 @@ const prettierConfig = await prettier.resolveConfig(__filename);
 
 // Compile TypeScript definition files.
 {
-  const compilerOptions = await parseCompilerOptions(tsconfig);
-
   const program = ts.createProgram([inputTsFile], {
-    ...compilerOptions,
+    ...tsconfig.options,
     noEmit: false,
     declaration: true,
     emitDeclarationOnly: true,
@@ -80,11 +78,7 @@ const prettierConfig = await prettier.resolveConfig(__filename);
     bundledPackages: [],
     newlineKind: "lf",
     compiler: {
-      overrideTsconfig: deepmerge(tsconfig, {
-        compilerOptions: {
-          skipLibCheck: true,
-        },
-      }),
+      tsconfigFilePath: path.resolve(root, "tsconfig.api.json"),
     },
     dtsRollup: {
       enabled: true,
@@ -170,33 +164,15 @@ async function removeBuildDir() {
 
 /**
  * @param {string} file
+ * @return {ts.ParsedCommandLine}
  */
 async function readTsConfig(file) {
-  const configJson = await fs.promises.readFile(file, "utf-8");
-
-  const { config, error } = ts.parseConfigFileTextToJson(file, configJson);
-  if (error && emitDiagnostics(error)) {
+  const configJson = await ts.readJsonConfigFile(file, (path) => fs.readFileSync(path, "utf-8"));
+  const config = ts.parseJsonSourceFileConfigFileContent(configJson, ts.sys, root);
+  if (emitDiagnostics(config.errors)) {
     process.exit(1);
   }
-
   return config;
-}
-
-/**
- * @param {string} file
- * @return {ts.CompilerOptions}
- */
-async function parseCompilerOptions(config, file = tsconfigFile) {
-  const { options, errors } = ts.convertCompilerOptionsFromJson(
-    config?.compilerOptions ?? {},
-    root,
-    file,
-  );
-  if (emitDiagnostics(errors)) {
-    process.exit(1);
-  }
-
-  return options;
 }
 
 /**

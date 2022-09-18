@@ -1,2 +1,3 @@
 * text=auto eol=lf
-api-extractor.json linguist-language=JSON-with-Comments
+
+.vscode/**/*.json linguist-language=JSON-with-Comments

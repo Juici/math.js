@@ -75,8 +75,9 @@ module.exports = {
     },
     {
       extends: ["plugin:jest/recommended", "plugin:jest/style"],
-      files: ["**/__tests__/**"],
+      files: ["matchers/**", "**/__tests__/**"],
       rules: {
+        "import/no-extraneous-dependencies": "off",
         "@typescript-eslint/ban-ts-comment": "off",
         "@typescript-eslint/explicit-module-boundary-types": "off",
         "@typescript-eslint/no-empty-function": "off",
@@ -99,12 +100,6 @@ module.exports = {
         "no-console": "off",
       },
     },
-    {
-      files: ["rollup/**"],
-      parserOptions: {
-        project: "rollup/tsconfig.json",
-      },
-    },
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
@@ -121,6 +116,7 @@ module.exports = {
         devDependencies: [
           "**/__tests__/**",
           "build-plugins/**",
+          "matchers/**",
           "scripts/**",
           ".eslintrc.cjs",
           "jest.config.mjs",
@@ -183,7 +179,7 @@ module.exports = {
     "prefer-rest-params": "warn",
     "prefer-spread": "warn",
     "prefer-template": "error",
-    quotes: ["error", "double", { allowTemplateLiterals: false, avoidEscape: false }],
+    quotes: ["error", "double", { allowTemplateLiterals: true, avoidEscape: false }],
     radix: "warn",
     "sort-imports": ["error", { ignoreDeclarationSort: true }],
   },
