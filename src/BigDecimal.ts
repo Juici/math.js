@@ -211,7 +211,10 @@ export class BigDecimal {
   /**
    * Returns the division of this BigDecimal by the given value.
    *
-   * The number of decimal places precision can be specified, defaulting to 20.
+   * The result is rounded if necessary.
+   *
+   * @param dp The maximum number of decimal places precision, default `20`.
+   * @throws {RangeError} If `other` is `0`.
    */
   div(other: DecimalValue, dp: number = 20): BigDecimal {
     dp = validateDP(dp, "dp");
@@ -234,16 +237,21 @@ export class BigDecimal {
 
   /**
    * Returns the remainder of this BigDecimal divided by the given value.
+   *
+   * @throws {RangeError} If `other` is `0`.
    */
   rem(other: DecimalValue): BigDecimal {
-    const { digits: ld, scale: ls } = this;
     const [rd, rs] = components(other);
+    if (rd === 0n) {
+      throw new RangeError("Division by zero");
+    }
+    const { digits: ld, scale: ls } = this;
     const [l, r, scale] = withScale(ld, ls, rd, rs);
     return new BigDecimal(l % r, scale);
   }
 
   /**
-   * Returns the division of this BigDecimal by 2.
+   * Returns the division of this BigDecimal by `2`.
    *
    * This function is more efficient than `.div(2)`.
    */
