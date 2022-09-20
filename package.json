@@ -2,6 +2,22 @@
   "name": "@juici/math",
   "version": "0.1.0",
   "description": "A mathematics utility library",
+  "keywords": [
+    "arbitrary",
+    "precision",
+    "arithmetic",
+    "big",
+    "number",
+    "decimal",
+    "float",
+    "math",
+    "biginteger",
+    "bigdecimal",
+    "bignumber",
+    "bigmath",
+    "bigint",
+    "bignum"
+  ],
   "license": "(MIT OR Apache-2.0)",
   "files": [
     "LICENSE-APACHE",
