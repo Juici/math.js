@@ -429,15 +429,15 @@ export class BigDecimal {
    * @param hint The string "string", "number", or "default" to specify what primitive to return.
    *
    * @throws {TypeError} If `hint` was given something other than "string", "number", or "default".
-   * @returns A number if `hint` was "number" or "default", a string if 'hint' was "string".
+   * @returns A number if `hint` was "number", a string if 'hint' was "string" or "default".
    */
   [Symbol.toPrimitive](hint: string): string | number {
     switch (hint) {
-      case "string":
-        return this.toString();
       case "number":
-      case "default":
         return this.toNumber();
+      case "string":
+      case "default":
+        return this.toString();
       default:
         throw new TypeError(`Invalid hint: ${hint}`);
     }
