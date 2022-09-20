@@ -557,8 +557,8 @@ function components(n: DecimalValue): [bigint, number] {
       if (!Number.isFinite(n)) {
         throw new RangeError(`BigDecimal must be finite: ${n}`);
       }
-      if (Number.isInteger(n)) {
-        return [BigInt(Number.isSafeInteger(n) ? n : n.toFixed()), 0];
+      if (Number.isSafeInteger(n)) {
+        return [BigInt(n), 0];
       }
       return parseDecimal(n.toExponential());
 

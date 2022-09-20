@@ -66,6 +66,20 @@ describe("new BigDecimal(n)", () => {
       expect(v.toString()).toBe("-6.9");
     });
 
+    test("safe integer", () => {
+      const v = new BigDecimal(100);
+      expect(v.sign).toBe(1);
+      expect(v.dp).toBe(0);
+      expect(v.toString()).toBe("100");
+    });
+
+    test("not safe integer", () => {
+      const v = new BigDecimal(1e100);
+      expect(v.sign).toBe(1);
+      expect(v.dp).toBe(0);
+      expect(v.toString()).toBe(`1${"0".repeat(100)}`);
+    });
+
     test("not finite", () => {
       const e = () => new BigDecimal(NaN);
       expect(e).toThrow(RangeError);
@@ -133,17 +147,31 @@ test("negative decimal", () => {
 });
 
 test("postive tiny decimal", () => {
-  const v = new BigDecimal("0.000001");
+  const v = new BigDecimal("1e-100");
   expect(v.sign).toBe(1);
-  expect(v.dp).toBe(6);
-  expect(v.toString()).toBe("0.000001");
+  expect(v.dp).toBe(100);
+  expect(v.toString()).toBe(`0.${"0".repeat(99)}1`);
 });
 
 test("negative tiny decimal", () => {
-  const v = new BigDecimal("-0.000001");
+  const v = new BigDecimal("-1e-100");
   expect(v.sign).toBe(-1);
-  expect(v.dp).toBe(6);
-  expect(v.toString()).toBe("-0.000001");
+  expect(v.dp).toBe(100);
+  expect(v.toString()).toBe(`-0.${"0".repeat(99)}1`);
+});
+
+test("postive big decimal", () => {
+  const v = new BigDecimal("1.23e100");
+  expect(v.sign).toBe(1);
+  expect(v.dp).toBe(0);
+  expect(v.toString()).toBe(`123${"0".repeat(98)}`);
+});
+
+test("negative big decimal", () => {
+  const v = new BigDecimal("-1.23e100");
+  expect(v.sign).toBe(-1);
+  expect(v.dp).toBe(0);
+  expect(v.toString()).toBe(`-123${"0".repeat(98)}`);
 });
 
 test("normalize", () => {
