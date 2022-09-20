@@ -27,10 +27,10 @@ describe("new BigDecimal(digits, scale)", () => {
 describe("new BigDecimal(n)", () => {
   describe("new BigDecimal(string)", () => {
     test("valid", () => {
-      const v = new BigDecimal("4.20");
-      expect(v.sign).toBe(1);
-      expect(v.dp).toBe(1);
-      expect(v.toString()).toBe("4.2");
+      const n = new BigDecimal("4.20");
+      expect(n.sign).toBe(1);
+      expect(n.dp).toBe(1);
+      expect(n.toString()).toBe("4.2");
     });
 
     test("empty exponent", () => {
@@ -60,24 +60,24 @@ describe("new BigDecimal(n)", () => {
 
   describe("new BigDecimal(number)", () => {
     test("valid", () => {
-      const v = new BigDecimal(-6.9);
-      expect(v.sign).toBe(-1);
-      expect(v.dp).toBe(1);
-      expect(v.toString()).toBe("-6.9");
+      const n = new BigDecimal(-6.9);
+      expect(n.sign).toBe(-1);
+      expect(n.dp).toBe(1);
+      expect(n.toString()).toBe("-6.9");
     });
 
     test("safe integer", () => {
-      const v = new BigDecimal(100);
-      expect(v.sign).toBe(1);
-      expect(v.dp).toBe(0);
-      expect(v.toString()).toBe("100");
+      const n = new BigDecimal(100);
+      expect(n.sign).toBe(1);
+      expect(n.dp).toBe(0);
+      expect(n.toString()).toBe("100");
     });
 
     test("not safe integer", () => {
-      const v = new BigDecimal(1e100);
-      expect(v.sign).toBe(1);
-      expect(v.dp).toBe(0);
-      expect(v.toString()).toBe(`1${"0".repeat(100)}`);
+      const n = new BigDecimal(1e100);
+      expect(n.sign).toBe(1);
+      expect(n.dp).toBe(0);
+      expect(n.toString()).toBe(`1${"0".repeat(100)}`);
     });
 
     test("not finite", () => {
@@ -88,17 +88,17 @@ describe("new BigDecimal(n)", () => {
   });
 
   test("new BigDecimal(bigint)", () => {
-    const v = new BigDecimal(42n);
-    expect(v.sign).toBe(1);
-    expect(v.dp).toBe(0);
-    expect(v.toString()).toBe("42");
+    const n = new BigDecimal(42n);
+    expect(n.sign).toBe(1);
+    expect(n.dp).toBe(0);
+    expect(n.toString()).toBe("42");
   });
 
   test("new BigDecimal(BigDecimalLike)", () => {
-    const v = new BigDecimal({ digits: -314n, scale: 2 });
-    expect(v.sign).toBe(-1);
-    expect(v.dp).toBe(2);
-    expect(v.toString()).toBe("-3.14");
+    const n = new BigDecimal({ digits: -314n, scale: 2 });
+    expect(n.sign).toBe(-1);
+    expect(n.dp).toBe(2);
+    expect(n.toString()).toBe("-3.14");
   });
 
   test("invalid", () => {
@@ -112,73 +112,73 @@ describe("new BigDecimal(n)", () => {
 });
 
 test("zero", () => {
-  const v = new BigDecimal("0");
-  expect(v.sign).toBe(0);
-  expect(v.dp).toBe(0);
-  expect(v.toString()).toBe("0");
+  const n = new BigDecimal("0");
+  expect(n.sign).toBe(0);
+  expect(n.dp).toBe(0);
+  expect(n.toString()).toBe("0");
 });
 
 test("postive int", () => {
-  const v = new BigDecimal("123");
-  expect(v.sign).toBe(1);
-  expect(v.dp).toBe(0);
-  expect(v.toString()).toBe("123");
+  const n = new BigDecimal("123");
+  expect(n.sign).toBe(1);
+  expect(n.dp).toBe(0);
+  expect(n.toString()).toBe("123");
 });
 
 test("negative int", () => {
-  const v = new BigDecimal("-123");
-  expect(v.sign).toBe(-1);
-  expect(v.dp).toBe(0);
-  expect(v.toString()).toBe("-123");
+  const n = new BigDecimal("-123");
+  expect(n.sign).toBe(-1);
+  expect(n.dp).toBe(0);
+  expect(n.toString()).toBe("-123");
 });
 
 test("postive decimal", () => {
-  const v = new BigDecimal("123.456789");
-  expect(v.sign).toBe(1);
-  expect(v.dp).toBe(6);
-  expect(v.toString()).toBe("123.456789");
+  const n = new BigDecimal("123.456789");
+  expect(n.sign).toBe(1);
+  expect(n.dp).toBe(6);
+  expect(n.toString()).toBe("123.456789");
 });
 
 test("negative decimal", () => {
-  const v = new BigDecimal("-123.456789");
-  expect(v.sign).toBe(-1);
-  expect(v.dp).toBe(6);
-  expect(v.toString()).toBe("-123.456789");
+  const n = new BigDecimal("-123.456789");
+  expect(n.sign).toBe(-1);
+  expect(n.dp).toBe(6);
+  expect(n.toString()).toBe("-123.456789");
 });
 
 test("postive tiny decimal", () => {
-  const v = new BigDecimal("1e-100");
-  expect(v.sign).toBe(1);
-  expect(v.dp).toBe(100);
-  expect(v.toString()).toBe(`0.${"0".repeat(99)}1`);
+  const n = new BigDecimal("1e-100");
+  expect(n.sign).toBe(1);
+  expect(n.dp).toBe(100);
+  expect(n.toString()).toBe(`0.${"0".repeat(99)}1`);
 });
 
 test("negative tiny decimal", () => {
-  const v = new BigDecimal("-1e-100");
-  expect(v.sign).toBe(-1);
-  expect(v.dp).toBe(100);
-  expect(v.toString()).toBe(`-0.${"0".repeat(99)}1`);
+  const n = new BigDecimal("-1e-100");
+  expect(n.sign).toBe(-1);
+  expect(n.dp).toBe(100);
+  expect(n.toString()).toBe(`-0.${"0".repeat(99)}1`);
 });
 
 test("postive big decimal", () => {
-  const v = new BigDecimal("1.23e100");
-  expect(v.sign).toBe(1);
-  expect(v.dp).toBe(0);
-  expect(v.toString()).toBe(`123${"0".repeat(98)}`);
+  const n = new BigDecimal("1.23e100");
+  expect(n.sign).toBe(1);
+  expect(n.dp).toBe(0);
+  expect(n.toString()).toBe(`123${"0".repeat(98)}`);
 });
 
 test("negative big decimal", () => {
-  const v = new BigDecimal("-1.23e100");
-  expect(v.sign).toBe(-1);
-  expect(v.dp).toBe(0);
-  expect(v.toString()).toBe(`-123${"0".repeat(98)}`);
+  const n = new BigDecimal("-1.23e100");
+  expect(n.sign).toBe(-1);
+  expect(n.dp).toBe(0);
+  expect(n.toString()).toBe(`-123${"0".repeat(98)}`);
 });
 
 test("normalize", () => {
-  const v = new BigDecimal("3000");
-  expect(v.digits).toBe(3n);
-  expect(v.scale).toBe(-3);
-  expect(v.sign).toBe(1);
-  expect(v.dp).toBe(0);
-  expect(v.toString()).toBe("3000");
+  const n = new BigDecimal("3000");
+  expect(n.digits).toBe(3n);
+  expect(n.scale).toBe(-3);
+  expect(n.sign).toBe(1);
+  expect(n.dp).toBe(0);
+  expect(n.toString()).toBe("3000");
 });
