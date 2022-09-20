@@ -382,7 +382,7 @@ export class BigDecimal {
       }
     }
 
-    if (dp !== undefined && after.length < dp) {
+    if (after.length < dp) {
       after += "0".repeat(dp - after.length);
     }
 
@@ -390,6 +390,67 @@ export class BigDecimal {
     if (after.length > 0) {
       repr += `.${after}`;
     }
+
+    return neg ? `-${repr}` : repr;
+  }
+
+  /**
+   * Returns this BigDecimal formatted using exponential notation, with one
+   * digit before the decimal point.
+   *
+   * The result is rounded if necessary, and the fractional component is padded
+   * with zeros if necessary so that it has the specified length.
+   *
+   * @param dp The number of decimal places, default to the number of decimal
+   *           places required to represent the value uniquely.
+   * @throws {RangeError} If `dp` is less than `0`.
+   */
+  toExponential(dp?: number): string {
+    const neg = this.digits < 0n;
+
+    let digits = neg ? -this.digits : this.digits;
+    let scale = this.scale;
+
+    if (dp !== undefined) {
+      dp = validateDP(dp, "dp");
+
+      if (scale < 0) {
+        const factor = 10n ** BigInt(-scale);
+        digits *= factor;
+        scale = 0;
+      }
+
+      const extra = digits.toString().length - 1 - dp;
+      if (extra > 0) {
+        const factor = 10n ** BigInt(extra);
+        const [q, r] = divRem(digits, factor);
+
+        digits = q + roundingTerm(r);
+        scale -= extra;
+      }
+    }
+
+    let exp = -scale;
+
+    let before = digits.toString();
+    let after = "";
+
+    const len = before.length;
+    if (len > 1) {
+      after = before.slice(1);
+      before = before.slice(0, 1);
+      exp += len - 1;
+    }
+
+    if (dp !== undefined && after.length < dp) {
+      after += "0".repeat(dp - after.length);
+    }
+
+    let repr = before;
+    if (after.length > 0) {
+      repr += `.${after}`;
+    }
+    repr += `e${exp >= 0 ? "+" : ""}${exp}`;
 
     return neg ? `-${repr}` : repr;
   }
