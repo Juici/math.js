@@ -349,7 +349,7 @@ export class BigDecimal {
   toFixed(dp: number = 0): string {
     dp = validateDP(dp, "dp");
 
-    let digits: bigint = this.digits;
+    let digits = this.digits;
     let scale = this.scale;
 
     if (dp < scale) {
@@ -362,23 +362,23 @@ export class BigDecimal {
 
     const neg = digits < 0n;
 
-    let s = neg ? (-digits).toString() : digits.toString();
-    const len = s.length;
+    let repr = neg ? (-digits).toString() : digits.toString();
+    const len = repr.length;
 
     let before: string;
     let after: string;
 
     if (scale >= len) {
       before = "0";
-      after = "0".repeat(scale - len) + digits;
+      after = "0".repeat(scale - len) + repr;
     } else {
       const pos = len - scale;
       if (pos > len) {
-        before = digits + "0".repeat(pos - len);
+        before = repr + "0".repeat(pos - len);
         after = "";
       } else {
-        before = s.slice(0, pos);
-        after = s.slice(pos);
+        before = repr.slice(0, pos);
+        after = repr.slice(pos);
       }
     }
 
@@ -386,12 +386,12 @@ export class BigDecimal {
       after += "0".repeat(dp - after.length);
     }
 
-    s = before;
+    repr = before;
     if (after.length > 0) {
-      s += `.${after}`;
+      repr += `.${after}`;
     }
 
-    return neg ? `-${s}` : s;
+    return neg ? `-${repr}` : repr;
   }
 
   /**
