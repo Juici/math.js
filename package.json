@@ -29,9 +29,9 @@
     "type": "git",
     "url": "https://github.com/Juici/math.js.git"
   },
-  "types": "dist/index.d.ts",
-  "main": "dist/cjs/index.js",
-  "module": "dist/esm/index.js",
+  "types": "./dist/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -52,8 +52,6 @@
     "build:types": "node ./scripts/build-types.mjs",
     "coverage": "jest --coverage",
     "lint": "eslint . --cache --ext cjs,mjs,ts,md",
-    "prepare": "yarn build",
-    "prepublishOnly": "yarn test",
     "test": "yarn lint && jest"
   },
   "devDependencies": {
